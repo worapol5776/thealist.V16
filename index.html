@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="th"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thealist — Cinema, elevated</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;family=Prompt:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    :root{--red:#e50914;--gold:#ffd700;--charcoal:#1a1a1a}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"DM Sans","Prompt",sans-serif;color:#f5f5f5;background:#000}
+    button,input,select{font:inherit}button{cursor:pointer}:focus-visible{outline:2px solid var(--gold)!important;outline-offset:3px}
+    .shell{width:100%;max-width:1280px;margin:auto;padding-inline:clamp(20px,5vw,70px)}
+    .site-header{backdrop-filter:blur(18px);border-bottom:1px solid #292929}
+    .navlink{color:#ccc;transition:color .2s}.navlink:hover,.navlink.active{color:#fff}
+    .btn-red{background:var(--red);color:white;border-radius:10px;font-weight:700;transition:background .2s,transform .2s}.btn-red:hover{background:#b90710;transform:translateY(-2px)}
+    .btn-outline{border:1px solid #575757;border-radius:10px;transition:border-color .2s,background .2s}.btn-outline:hover{border-color:var(--gold);background:#262626}
+    .card{background:#1a1a1a;border:1px solid #333;border-radius:16px;overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s}
+    .card:hover,.card:focus-within{border-color:#8c6516;box-shadow:0 18px 40px #0009}
+    .field{background:#202020;color:white;border:1px solid #494949;border-radius:10px;padding:12px 14px;width:100%;min-height:46px}.field::placeholder{color:#aaa}
+    .tab{border-bottom:2px solid transparent;padding:13px 18px;color:#bbb;font-weight:700;white-space:nowrap}.tab.active{color:#fff;border-color:var(--red)}
+    .demo-badge{display:inline-flex;align-items:center;border:1px solid #a98226;background:#34290c;color:#ffe177;border-radius:30px;padding:4px 10px;font-size:11px;font-weight:800;white-space:nowrap}
+    .eyebrow{letter-spacing:.23em;text-transform:uppercase;font-size:11px;font-weight:800;color:var(--gold)}
+    .hero{min-height:510px;display:flex;align-items:center;position:relative;overflow:hidden;background:#151515}
+    .hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.54}
+    .hero-shade{position:absolute;inset:0;background:linear-gradient(90deg,#000 7%,#000d 34%,#0003),linear-gradient(0deg,#000,transparent 36%)}
+    .display{font-size:clamp(42px,6vw,82px);font-weight:800;letter-spacing:-.055em;line-height:1.04}
+    .poster-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}.poster:has(.poster-image):before,.poster:has(.poster-image):after{display:none}.poster{aspect-ratio:2/3;background:linear-gradient(145deg,#292929,#4b1820 60%,#090909);border:1px solid #4a4034;display:flex;align-items:end;position:relative;overflow:hidden}
+    .poster:before{content:"";position:absolute;width:90%;height:75%;top:-16%;right:-30%;border:1px solid #ffffff30;border-radius:50%;box-shadow:0 0 70px #e5091433,0 0 0 60px #ffffff08,0 0 0 130px #ffffff05}
+    .poster:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#080808,transparent 70%)}
+    .poster[data-tone=blue]{background:linear-gradient(145deg,#071c31,#123c50,#070b12)}
+    .poster[data-tone=gold]{background:linear-gradient(145deg,#28200b,#6a4514,#080807)}
+    .poster[data-tone=violet]{background:linear-gradient(145deg,#26182c,#533347,#080709)}
+    .poster[data-tone=green]{background:linear-gradient(145deg,#10251e,#244631,#080b09)}
+    .poster-inner{z-index:1;position:relative;padding:20px;width:100%}
+    .poster-title{font-weight:800;line-height:1.12;overflow-wrap:anywhere;font-size:clamp(18px,2vw,29px)}
+    .ticket{background:#1a1a1a;border:1px solid #665329;border-radius:20px;overflow:hidden;box-shadow:0 18px 42px #0009;transition:transform .25s,border-color .25s}
+    .ticket:hover,.ticket:focus-visible{transform:translateY(-4px);border-color:var(--gold)}
+    .ticket-stub{position:relative;border-top:2px dashed #75643d;background:#211d16}
+    .ticket-stub:before,.ticket-stub:after{content:"";position:absolute;top:-13px;width:24px;height:24px;border-radius:50%;background:#000}
+    .ticket-stub:before{left:-12px}.ticket-stub:after{right:-12px}
+    .ticket-poster{background:linear-gradient(145deg,#3b2922,#161616);border:1px solid #655738}
+    .ticket-status{display:inline-flex;align-items:center;gap:7px;border:1px solid #756237;border-radius:999px;padding:4px 10px;color:#ffe177;font-size:12px;font-weight:700}
+    .ticket-status[data-status=Pending]{border-color:#ad7946;color:#ffcc93}
+    .ticket-status[data-status=Cancelled]{border-color:#8e4545;color:#ffabab}
+    .ticket-status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+    .qr-demo{background:repeating-linear-gradient(45deg,#252017,#252017 8px,#2c261a 8px,#2c261a 16px);border:1px solid #766035;border-radius:12px;text-align:center;padding:18px;color:var(--gold)}
+    .modal-backdrop{position:fixed;inset:0;z-index:70;background:#000d;display:flex;align-items:center;justify-content:center;padding:18px}
+    .modal-backdrop.hidden{display:none}.modal-panel{width:min(100%,520px);max-height:calc(90 * min(var(--vh,1vh),1vh));overflow:auto;background:#1a1a1a;border:1px solid #60543c;border-radius:20px;box-shadow:0 30px 90px #000}
+    .shimmer{background:linear-gradient(100deg,#222 20%,#353535 45%,#222 70%);background-size:200% 100%;animation:shimmer 1.3s linear infinite}@keyframes shimmer{to{background-position-x:-200%}}
+    .view-enter{animation:rise .3s ease both}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .news-cover{min-height:190px;display:flex;align-items:end;padding:20px;background:radial-gradient(circle at 75% 25%,#74412a,#291719 42%,#111 80%);border-bottom:1px solid #444}
+    @media(max-width:767px){.hero{min-height:470px}.hero-shade{background:linear-gradient(90deg,#000d,#0007),linear-gradient(0deg,#000,transparent)}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+ </head>
+ <body class="w-full min-h-screen" style="background: rgb(0, 0, 0);">
+  <header class="site-header sticky top-0 z-50 w-full" style="background: rgb(8, 8, 8);">
+   <div class="shell flex items-center justify-between gap-5 h-[76px]"><button id="logo" type="button" class="text-left shrink-0" aria-label="Thealist — Home"><span class="font-extrabold" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 25px;">Thealist</span><span class="text-[#e50914] text-2xl">.</span></button>
+    <nav aria-label="Main navigation" class="hidden md:flex items-center gap-7"><button type="button" data-view="home" class="navlink active" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">Home</button> <button type="button" data-view="movies" class="navlink" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">Movies</button> <button type="button" data-view="news" class="navlink" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">News</button> <button type="button" data-view="tickets" class="navlink" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">My Tickets</button>
+    </nav>
+    <div class="flex items-center gap-2 sm:gap-4"><button id="header-search" type="button" class="p-2 rounded-lg hover:bg-[#292929]" aria-label="ค้นหาภาพยนตร์"><i data-lucide="search" class="w-5 h-5"></i></button> <button id="auth-open" type="button" class="btn-red px-4 py-2.5 hidden sm:block" style="background: rgb(229, 9, 20); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Demo Sign In</button> <button id="mobile-toggle" type="button" aria-label="เปิดเมนู" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden p-2"><i data-lucide="menu" class="w-6 h-6"></i></button>
+    </div>
+   </div>
+   <nav id="mobile-menu" aria-label="Mobile navigation" class="hidden md:hidden border-t border-[#333] px-5 py-4 space-y-2 bg-[#111]"><button type="button" data-view="home" class="block w-full text-left py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Home</button> <button type="button" data-view="movies" class="block w-full text-left py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Movies</button> <button type="button" data-view="news" class="block w-full text-left py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">News</button> <button type="button" data-view="tickets" class="block w-full text-left py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">My Tickets</button> <button id="mobile-auth" type="button" class="btn-red px-5 py-2 mt-2" style="background: rgb(229, 9, 20); color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Demo Sign In</button>
+   </nav>
+  </header>
+  <main class="w-full min-h-[55rem]">
+   <section id="home-view" class="view-enter">
+    <div class="hero"><img loading="lazy" class="hero-photo" src="https://images.pexels.com/photos/7991321/pexels-photo-7991321.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1920" alt="Rows of empty red theater seats in a dark cinema auditorium, awaiting audience.">
+     <div class="hero-shade" aria-hidden="true"></div>
+     <div class="shell relative z-10 py-20">
+      <p class="eyebrow mb-6" style="color: rgb(255, 215, 0); font-weight: 800; font-style: normal; font-size: 16px;">THE BIG SCREEN AWAITS</p>
+      <h1 class="display max-w-[780px]" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 64px;">Experience the Magic of Cinema</h1>
+      <p class="mt-6 max-w-[550px] leading-relaxed" style="color: rgb(222, 222, 222); font-weight: 400; font-style: normal; font-size: 19px;">Explore movies and imagine your next night at the cinema.</p><button type="button" data-view="movies" class="btn-red mt-9 px-7 py-4" style="background: rgb(229, 9, 20); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Explore Movies</button>
+      <p class="mt-5" style="color: rgb(199, 199, 199); font-weight: 400; font-style: normal; font-size: 12px;">Demo Mode · Explore the experience. No real bookings or payments.</p>
+     </div>
+    </div>
+    <div class="shell py-16 md:py-20">
+     <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+      <div>
+       <p class="eyebrow mb-3" style="color: rgb(255, 215, 0); font-weight: 800; font-style: normal; font-size: 16px;">CURATED FOR YOU · DEMO DATA</p>
+       <h2 class="font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Recommended Movies</h2>
+      </div><button type="button" data-view="movies" class="btn-outline px-5 py-2.5" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Explore all movies →</button>
+     </div>
+     <div id="recommended-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+    </div>
+   </section>
+   <section id="movies-view" class="shell py-12 md:py-16 hidden view-enter"><button type="button" data-view="home" class="btn-outline px-4 py-2 mb-8" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">← Back to Home</button>
+    <p class="eyebrow mb-3" style="color: rgb(255, 215, 0); font-weight: 800; font-style: normal; font-size: 16px;">THE LINEUP · DEMO DATA</p>
+    <h1 class="font-extrabold mb-3" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 32px;">Movies</h1>
+    <p class="mb-5" style="color: rgb(170, 170, 170); font-weight: 400; font-style: normal; font-size: 16px;">สำรวจภาพยนตร์ เลือกแท็บ ค้นหา และกรองตามประเภทได้ทันที</p>
+    <p class="border-l-2 border-[#ffd700] pl-4 mb-9 max-w-3xl leading-relaxed" style="color: rgb(200, 200, 200); font-weight: 400; font-style: normal; font-size: 16px;">Demo Data · ข้อมูลวันฉายและรายละเอียดควรตรวจสอบกับผู้จัดจำหน่ายก่อนเผยแพร่จริง อ้างอิงการจัดหมวดตามวันที่ 13 ตุลาคม 2569</p>
+    <div role="tablist" aria-label="สถานะภาพยนตร์" class="flex border-b border-[#383838] mb-7"><button type="button" role="tab" aria-selected="true" data-movie-tab="now" class="tab active" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">กำลังฉาย</button> <button type="button" role="tab" aria-selected="false" data-movie-tab="upcoming" class="tab" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">โปรแกรมหน้า</button>
+    </div>
+    <div class="grid sm:grid-cols-[minmax(0,1fr)_230px] gap-3 mb-7">
+     <div>
+      <label for="movie-search" class="block mb-2" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">ค้นหาภาพยนตร์</label><input id="movie-search" class="field" type="search" autocomplete="off" placeholder="ชื่อไทย ชื่ออังกฤษ ประเภท หรือเรื่องย่อ..." style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">
+     </div>
+     <div>
+      <label for="genre-filter" class="block mb-2" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">ประเภท</label><select id="genre-filter" class="field"><option value="all">ทุกประเภท</option></select>
+     </div>
+    </div>
+    <p id="result-count" role="status" class="text-sm text-[#aaa] mb-5"></p>
+    <div id="movies-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+    <div id="movie-empty" class="hidden card text-center p-10">
+     <h2 class="font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">ไม่พบภาพยนตร์ที่ตรงกับตัวกรอง</h2>
+     <p class="mt-2" style="color: rgb(170, 170, 170); font-weight: 400; font-style: normal; font-size: 16px;">ลองเปลี่ยนคำค้นหาหรือล้างตัวกรองเพื่อดูรายการอื่น</p><button id="clear-movie-filters" type="button" class="btn-outline mt-5 px-5 py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">ล้างตัวกรอง</button>
+    </div>
+   </section>
+   <section id="detail-view" class="shell py-10 md:py-16 hidden view-enter"><button type="button" data-view="movies" class="btn-outline px-4 py-2 mb-8" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">← Back to Movies</button>
+    <div id="detail-content"></div>
+   </section>
+   <section id="news-view" class="shell py-10 md:py-16 hidden view-enter">
+    <p class="eyebrow mb-3" style="color: rgb(255, 215, 0); font-weight: 800; font-style: normal; font-size: 16px;">THEALIST / EDITORIAL · DEMO DATA</p>
+    <h1 class="font-extrabold mb-4" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 32px;">Cinema &amp; Movie Updates</h1>
+    <p class="max-w-3xl border-l-2 border-[#ffd700] pl-4 mb-9 leading-relaxed" style="color: rgb(200, 200, 200); font-weight: 400; font-style: normal; font-size: 16px;">ข้อมูลตัวอย่าง โปรดตรวจสอบกับแหล่งข้อมูลจริงก่อนเผยแพร่ · ข่าวและอันดับรายได้ยังไม่ได้เชื่อมต่อ API</p>
+    <div class="mb-6">
+     <label for="news-search" class="block mb-2" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">Search News</label><input id="news-search" class="field max-w-xl" type="search" placeholder="ค้นหาหัวข้อ บทคัดย่อ หรือเนื้อหาข่าว..." style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">
+    </div>
+    <div id="news-filters" role="group" aria-label="News categories" class="flex flex-wrap gap-2 mb-7"><button type="button" data-category="All" class="btn-outline px-4 py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">All</button> <button type="button" data-category="Movie News" class="btn-outline px-4 py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Movie News</button> <button type="button" data-category="Box Office" class="btn-outline px-4 py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Box Office</button> <button type="button" data-category="Upcoming Movies" class="btn-outline px-4 py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Upcoming Movies</button> <button type="button" data-category="Reviews" class="btn-outline px-4 py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Reviews</button> <button type="button" data-category="Entertainment" class="btn-outline px-4 py-2" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Entertainment</button>
+    </div>
+    <p id="news-result-count" role="status" class="text-sm text-[#aaa] mb-5"></p>
+    <div id="news-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    <div id="news-empty" class="hidden card p-9 text-center">
+     <h2 class="font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">ไม่พบข่าวที่ตรงกับการค้นหา</h2>
+    </div>
+    <section id="box-office" class="mt-16 rounded-2xl border border-[#383838] p-6 md:p-9" style="background: rgb(26, 26, 26);">
+     <div class="flex flex-wrap gap-3 items-center">
+      <h2 class="font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">10 อันดับหนังทำรายได้สูงสุดตลอดกาลทั่วโลก</h2><span class="demo-badge" style="background: rgb(52, 41, 12); color: rgb(255, 225, 119); font-weight: 800; font-style: normal; font-size: 16px;">Demo Data</span>
+     </div>
+     <p class="mt-3" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">ข้อมูลตัวอย่าง โปรดตรวจสอบยอดล่าสุดจากฐานข้อมูลรายได้ภาพยนตร์ก่อนเผยแพร่จริง</p>
+     <div role="tablist" aria-label="Box Office ranking mode" class="flex flex-wrap border-b border-[#444] mt-6"><button type="button" role="tab" data-ranking="weekly" class="tab" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Weekly</button> <button type="button" role="tab" data-ranking="domestic" class="tab" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Domestic</button> <button type="button" role="tab" data-ranking="worldwide" class="tab active" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Worldwide</button>
+     </div>
+     <div id="ranking-list" class="divide-y divide-[#333]" aria-live="polite"></div>
+    </section>
+   </section>
+   <section id="news-detail-view" class="shell py-10 md:py-16 hidden view-enter"><button type="button" data-view="news" class="btn-outline px-4 py-2 mb-8" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">← Back to News</button>
+    <div id="news-detail-content"></div>
+   </section>
+   <section id="tickets-view" class="shell py-10 md:py-16 hidden view-enter">
+    <div class="flex flex-wrap items-center gap-3 mb-3">
+     <p class="eyebrow" style="color: rgb(255, 215, 0); font-weight: 800; font-style: normal; font-size: 16px;">THEALIST / YOUR CINEMA NIGHTS</p><span class="demo-badge" style="background: rgb(52, 41, 12); color: rgb(255, 225, 119); font-weight: 800; font-style: normal; font-size: 16px;">Demo Data</span>
+    </div>
+    <h1 class="font-extrabold mb-3" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 32px;">My Tickets</h1>
+    <p class="text-[#bbb] mb-5" style="color: rgb(187, 187, 187); font-weight: 400; font-style: normal; font-size: 16px;">Your upcoming screenings and cinema memories, all in one place. Demo Mode only.</p>
+    <div class="border-l-2 border-[#ffd700] pl-4 mb-9" style="background: rgb(26, 26, 26);">
+     <p class="" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">แสดงเฉพาะข้อมูลการจองของบัญชีที่เข้าสู่ระบบ</p>
+     <p class="mt-1" style="color: rgb(170, 170, 170); font-weight: 400; font-style: normal; font-size: 16px;">QR Code กับ Booking ID เป็นข้อมูลส่วนตัวของผู้ใช้</p>
+    </div>
+    <div id="tickets-login" class="card max-w-2xl mx-auto p-8 sm:p-12 text-center"><i data-lucide="ticket" class="w-10 h-10 mx-auto mb-5 text-[#ffd700]"></i>
+     <h2 class="font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Sign in to view your tickets</h2>
+     <p class="mt-4 leading-relaxed" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">แสดงเฉพาะข้อมูลการจองของบัญชีที่เข้าสู่ระบบ ใช้ Demo Sign In เพื่อดูตั๋วตัวอย่าง โดยไม่ต้องให้ข้อมูลส่วนตัวจริง</p><button id="tickets-sign-in" type="button" class="btn-red px-7 py-3 mt-7" style="background: rgb(229, 9, 20); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Sign In</button>
+    </div>
+    <div id="tickets-private" class="hidden">
+     <div id="tickets-loading" role="status" aria-label="Loading Demo Data" class="space-y-5">
+      <div class="grid grid-cols-3 gap-3">
+       <div class="shimmer h-28 rounded-2xl"></div>
+       <div class="shimmer h-28 rounded-2xl"></div>
+       <div class="shimmer h-28 rounded-2xl"></div>
+      </div>
+      <div class="shimmer h-64 rounded-2xl"></div>
+      <div class="shimmer h-64 rounded-2xl"></div>
+     </div>
+     <div id="tickets-error" role="alert" class="hidden card p-9 text-center">
+      <h2 class="font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Could not load Demo Data</h2>
+      <p class="mt-3" style="color: rgb(187, 187, 187); font-weight: 400; font-style: normal; font-size: 16px;">รายการตั๋วตัวอย่างยังไม่พร้อมใช้งาน ลองโหลดอีกครั้ง</p><button id="tickets-retry" type="button" class="btn-red px-6 py-3 mt-6" style="background: rgb(229, 9, 20); color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Retry demo action</button>
+     </div>
+     <div id="tickets-content" class="hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-9">
+       <div class="card p-5">
+        <p class="text-[#aaa]" style="color: rgb(170, 170, 170); font-weight: 400; font-style: normal; font-size: 16px;">Upcoming · Demo Data</p><strong id="summary-upcoming" class="block text-3xl text-[#ffd700] mt-2">0</strong>
+       </div>
+       <div class="card p-5">
+        <p class="text-[#aaa]" style="color: rgb(170, 170, 170); font-weight: 400; font-style: normal; font-size: 16px;">Past · Demo Data</p><strong id="summary-past" class="block text-3xl text-[#ffd700] mt-2">0</strong>
+       </div>
+       <div class="card p-5">
+        <p class="text-[#aaa]" style="color: rgb(170, 170, 170); font-weight: 400; font-style: normal; font-size: 16px;">Cancelled · Demo Data</p><strong id="summary-cancelled" class="block text-3xl text-[#ffd700] mt-2">0</strong>
+       </div>
+      </div>
+      <div role="tablist" aria-label="Ticket categories" class="flex overflow-x-auto border-b border-[#383838] mb-7"><button type="button" role="tab" aria-selected="true" data-ticket-tab="Upcoming" class="tab active" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Upcoming</button> <button type="button" role="tab" aria-selected="false" data-ticket-tab="Past" class="tab" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Past</button> <button type="button" role="tab" aria-selected="false" data-ticket-tab="Cancelled" class="tab" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Cancelled</button>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-5">
+       <div class="lg:col-span-2">
+        <label for="ticket-search" class="block mb-2" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">Search tickets</label><input id="ticket-search" class="field" type="search" autocomplete="off" placeholder="Movie, cinema, location or booking ID..." style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">
+       </div>
+       <div>
+        <label for="ticket-movie" class="block mb-2" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">Movie</label><select id="ticket-movie" class="field"><option value="">All movies</option></select>
+       </div>
+       <div>
+        <label for="ticket-date" class="block mb-2" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">Screening date</label><input id="ticket-date" class="field" type="date">
+       </div>
+       <div>
+        <label for="ticket-status" class="block mb-2" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">Booking status</label><select id="ticket-status" class="field"><option value="">All statuses</option><option value="Confirmed">Confirmed</option><option value="Pending">Pending</option><option value="Cancelled">Cancelled</option></select>
+       </div>
+      </div>
+      <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
+       <p id="ticket-count" role="status" class="text-sm text-[#bbb]"></p>
+       <div class="flex items-center gap-3">
+        <label for="ticket-sort" class="" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">Sort by date</label><select id="ticket-sort" class="field !w-auto"><option value="nearest">Nearest first</option><option value="latest">Latest first</option></select>
+       </div>
+      </div>
+      <div id="ticket-list" class="space-y-5" aria-live="polite"></div>
+      <div id="tickets-empty" class="hidden card p-10 sm:p-14 text-center"><i data-lucide="ticket-x" class="w-10 h-10 text-[#ffd700] mx-auto mb-5"></i>
+       <h2 class="font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">No tickets yet.</h2>
+       <p class="mt-3" style="color: rgb(187, 187, 187); font-weight: 400; font-style: normal; font-size: 16px;">Your next cinematic experience is waiting for you.</p>
+       <p id="tickets-empty-context" class="text-[#aaa] text-sm mt-3"></p><button type="button" data-view="movies" class="btn-red px-6 py-3 mt-7" style="background: rgb(229, 9, 20); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Browse Movies</button>
+      </div>
+     </div>
+    </div>
+   </section>
+   <section id="ticket-detail-view" class="shell py-10 md:py-16 hidden view-enter"><button type="button" data-view="tickets" class="btn-outline px-4 py-2 mb-8" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">← Back to My Tickets</button>
+    <div id="ticket-detail-content"></div>
+   </section>
+   <section id="docs-view" class="shell py-12 md:py-16 hidden view-enter"><button type="button" data-view="home" class="btn-outline px-4 py-2 mb-8" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">← Back to Home</button>
+    <p class="eyebrow mb-3" style="color: rgb(255, 215, 0); font-weight: 400; font-style: normal; font-size: 16px;">THEALIST / PRODUCT NOTES</p>
+    <h1 class="font-bold mb-5" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 32px;">Project Documentation</h1>
+    <p class="max-w-3xl leading-relaxed mb-10" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">System Flow &amp; Logic ของ Thealist: interactive prototype บนหน้าเดียว ใช้ mock data เท่านั้น ไม่มีระบบจองหรือชำระเงินจริง</p>
+    <div class="grid md:grid-cols-2 gap-5">
+     <article class="card p-7">
+      <h2 class="font-bold mb-4" style="color: rgb(255, 215, 0); font-weight: 700; font-style: normal; font-size: 24px;">01 / การนำทางและการค้นหา</h2>
+      <p class="whitespace-pre-line leading-relaxed" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">Top Navigation สลับ Home, Movies, News และ My Tickets ด้วย client-side state
+
+Movies มีแท็บ ค้นหา และตัวกรองประเภท News มีค้นหาและหมวดหมู่</p>
+     </article>
+     <article class="card p-7">
+      <h2 class="font-bold mb-4" style="color: rgb(255, 215, 0); font-weight: 700; font-style: normal; font-size: 24px;">02 / โครงสร้างหน้าจอ</h2>
+      <p class="whitespace-pre-line leading-relaxed" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">MovieCard และ Movie Detail แสดงข้อมูลภาพยนตร์ตัวอย่าง
+
+TicketCard และ TicketDetails แสดงตั๋วจำลองพร้อม DEMO QR ที่ใช้เข้างานไม่ได้</p>
+     </article>
+     <article class="card p-7">
+      <h2 class="font-bold mb-4" style="color: rgb(255, 215, 0); font-weight: 700; font-style: normal; font-size: 24px;">03 / Demo booking flow</h2>
+      <p class="whitespace-pre-line leading-relaxed" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">Book Tickets ทดลองเลือกเวลาและจำนวนบัตรเท่านั้น
+
+My Tickets ใช้ Demo Sign In และการยกเลิกใน client-side state ไม่มีการกันที่นั่ง ออกบัตร ชำระเงิน หรือคืนเงินจริง</p>
+     </article>
+     <article class="card p-7">
+      <h2 class="font-bold mb-4" style="color: rgb(255, 215, 0); font-weight: 700; font-style: normal; font-size: 24px;">04 / ข้อมูลและความเป็นส่วนตัว</h2>
+      <p class="whitespace-pre-line leading-relaxed" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">ข้อมูลภาพยนตร์ ข่าว และการจองเป็น mock data ใน JavaScript ไม่มีการเรียก API
+
+แสดงเฉพาะการจองของ demo user ที่เข้าสู่ระบบ ไม่มีการรับรหัสผ่านหรือข้อมูลการชำระเงิน</p>
+     </article>
+    </div>
+   </section>
+  </main>
+  <footer class="w-full border-t border-[#343434]" style="background: rgb(16, 16, 16);">
+   <div class="shell py-12 grid md:grid-cols-[1fr_auto] gap-8">
+    <div>
+     <p class="font-extrabold mb-3" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 16px;">Thealist.</p>
+     <p class="max-w-sm leading-relaxed" style="color: rgb(170, 170, 170); font-weight: 400; font-style: normal; font-size: 16px;">A cinematic experience, imagined. Explore movies in Demo Mode — no real tickets or payments.</p>
+     <p class="mt-7" style="color: rgb(153, 153, 153); font-weight: 400; font-style: normal; font-size: 14px;">© 2026 Thealist</p>
+    </div>
+    <div class="flex flex-col gap-5 md:items-end">
+     <div class="flex gap-3"><button type="button" class="social btn-outline p-2.5" aria-label="Instagram (Demo Mode)" data-social="Instagram"><i data-lucide="instagram" class="w-5 h-5"></i></button> <button type="button" class="social btn-outline p-2.5" aria-label="Facebook (Demo Mode)" data-social="Facebook"><i data-lucide="facebook" class="w-5 h-5"></i></button> <button type="button" class="social btn-outline p-2.5" aria-label="YouTube (Demo Mode)" data-social="YouTube"><i data-lucide="youtube" class="w-5 h-5"></i></button>
+     </div>
+     <nav aria-label="Footer navigation" class="flex flex-wrap gap-x-5 gap-y-3"><button id="terms-button" type="button" class="hover:text-[#ffd700]" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">Terms of Service</button> <button id="privacy-button" type="button" class="hover:text-[#ffd700]" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">Privacy Policy</button> <button type="button" data-view="docs" class="hover:text-[#ffd700]" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">Project Documentation</button>
+     </nav>
+    </div>
+   </div>
+  </footer>
+  <div id="auth-modal" class="modal-backdrop hidden" role="presentation">
+   <section class="modal-panel p-7" role="dialog" aria-modal="true" aria-labelledby="auth-heading">
+    <div class="flex justify-between items-start gap-4">
+     <div>
+      <p class="eyebrow mb-2" style="color: rgb(255, 215, 0); font-weight: 400; font-style: normal; font-size: 16px;">DEMO MODE / NO PERSONAL DATA</p>
+      <h2 id="auth-heading" class="font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Demo Sign In</h2>
+     </div><button type="button" data-close-modal="" aria-label="ปิดหน้าต่าง" class="btn-outline p-2"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <p class="mt-5 leading-relaxed" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">เข้าสู่ระบบด้วยบัญชีตัวอย่างเพื่อดูตั๋ว Demo Data เท่านั้น ไม่ต้องกรอกชื่อ อีเมล หรือรหัสผ่าน และไม่มีการเข้าสู่ระบบจริง</p><button id="demo-sign-in" type="button" class="btn-red w-full py-3 mt-7" style="background: rgb(229, 9, 20); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Continue as Demo User</button> <button id="demo-sign-out" type="button" class="btn-outline w-full py-3 mt-3 hidden" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Sign Out of Demo Mode</button>
+   </section>
+  </div>
+  <div id="booking-modal" class="modal-backdrop hidden" role="presentation">
+   <section class="modal-panel p-7" role="dialog" aria-modal="true" aria-labelledby="booking-heading">
+    <div class="flex justify-between gap-4">
+     <h2 id="booking-heading" class="font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">เลือกบัตรตัวอย่าง</h2><button type="button" data-close-modal="" aria-label="ปิดหน้าต่าง" class="btn-outline p-2"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <p class="my-5" style="color: rgb(204, 204, 204); font-weight: 400; font-style: normal; font-size: 16px;">Booking Simulation · ไม่มีการกันที่นั่ง ไม่มีการออกบัตร และไม่มีการชำระเงินจริง</p>
+    <p id="booking-movie" class="font-bold mb-5"></p>
+    <form id="booking-form">
+     <label for="showtime" class="block mb-2" style="color: rgb(238, 238, 238); font-weight: 400; font-style: normal; font-size: 16px;">รอบฉายตัวอย่าง</label><select id="showtime" class="field mb-4"><option>14:00 · Demo</option><option>17:30 · Demo</option><option>20:30 · Demo</option></select><label for="ticket-quantity" class="block mb-2" style="color: rgb(238, 238, 238); font-weight: 400; font-style: normal; font-size: 16px;">จำนวนบัตรตัวอย่าง</label><select id="ticket-quantity" class="field mb-5"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+     <p id="booking-summary" class="text-[#ffd700] mb-5" aria-live="polite"></p><button type="submit" class="btn-red w-full py-3" style="background: rgb(229, 9, 20); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">ทดลองขั้นตอนต่อไป · ไม่มีการจองจริง</button>
+    </form>
+   </section>
+  </div>
+  <div id="cancel-modal" class="modal-backdrop hidden" role="presentation">
+   <section class="modal-panel p-7" role="dialog" aria-modal="true" aria-labelledby="cancel-heading">
+    <div class="flex justify-between gap-4">
+     <h2 id="cancel-heading" class="font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 24px;">Cancel Booking · Demo Mode</h2><button type="button" data-close-modal="" aria-label="ปิดหน้าต่าง" class="btn-outline p-2"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <p class="mt-5 leading-relaxed" style="color: rgb(221, 221, 221); font-weight: 400; font-style: normal; font-size: 16px;">ต้องการบันทึกการยกเลิกตั๋วตัวอย่างนี้หรือไม่? การเปลี่ยนแปลงเกิดขึ้นเฉพาะในต้นแบบนี้ ไม่มีการยกเลิกหรือคืนเงินจริง</p>
+    <p id="cancel-booking-summary" class="text-[#ffd700] mt-4"></p>
+    <p class="mt-5 text-sm leading-relaxed" style="color: rgb(187, 187, 187); font-weight: 400; font-style: normal; font-size: 16px;">Demo refund policy: ตั๋วที่ยังไม่ผ่านรอบฉายและได้รับอนุญาตเท่านั้นจึงกดยกเลิกได้ เงื่อนไขจริงต้องตรวจสอบกับผู้ให้บริการ</p>
+    <p class="mt-2 text-sm" style="color: rgb(255, 215, 0); font-weight: 400; font-style: normal; font-size: 16px;">Demo refund status: pending review · ไม่มีการดำเนินการคืนเงินจริง</p>
+    <div class="flex flex-wrap gap-3 mt-7">
+     <button id="confirm-cancel" type="button" class="btn-red px-5 py-3" style="background: rgb(229, 9, 20); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Confirm Cancellation</button><button type="button" data-close-modal="" class="btn-outline px-5 py-3" style="color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Keep Booking</button>
+    </div>
+   </section>
+  </div>
+  <div id="info-modal" class="modal-backdrop hidden" role="presentation">
+   <section class="modal-panel p-7" role="dialog" aria-modal="true" aria-labelledby="info-title">
+    <div class="flex justify-between gap-4">
+     <h2 id="info-title" class="font-bold text-xl"></h2><button type="button" data-close-modal="" aria-label="ปิดหน้าต่าง" class="btn-outline p-2"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <p id="info-text" class="text-[#ccc] leading-relaxed mt-5"></p>
+   </section>
+  </div>
+  <div id="toast" role="status" aria-live="polite" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-[90] max-w-[min(90vw,500px)] rounded-xl border border-[#805521] bg-[#242018] px-5 py-3 shadow-2xl text-sm"></div>
+  <script>
+  const $ = id => document.getElementById(id);
+  const element = (tag,text,classes='') => {const n=document.createElement(tag);n.className=classes;n.textContent=text;return n};
+  const referenceDate='2026-10-13';
+  const catalog=[
+    {id:'tee-yod',title:'ธี่หยด สมิงเขาขวาง',english:'Tee Yod: Saming the Werebeast',poster:'posters/page-5.jpg',genres:'แอ็กชัน / สยองขวัญ',iso:'2026-09-30',date:'30 กันยายน 2569',duration:'111 นาที',status:'กำลังฉาย',synopsis:'ยักษ์และจ่าปพันธ์ออกปฏิบัติภารกิจตามหาคนหาย ก่อนต้องเผชิญหน้ากับไอ้โหง ผีร้ายในร่างสัตว์หรือเสือสมิงที่สามารถจำแลงกายได้ ท่ามกลางป่าอันตราย ทั้งคู่ต้องร่วมมือกันเอาชีวิตรอดและค้นหาความจร',tone:'green'},
+    {id:'other-mommy',title:'แม่...หลอน',english:'Other Mommy',poster:'posters/page-3.jpg',genres:'สยองขวัญ',iso:'2026-10-08',date:'8 ตุลาคม 2569',duration:'93 นาที',status:'กำลังฉาย',synopsis:'เบล่า เด็กหญิงวัยแปดขวบได้พบกับตัวตนลึกลับที่ออกมาจากตู้เสื้อผ้า และเรียกสิ่งนั้นว่า “แม่อีกคนหนึ่ง” ก่อนที่เหตุการณ์น่าสะพรึงกลัวจะค่อย ๆ คุกคามเธอและครอบครัว',tone:'violet'},
+    {id:'resident-evil',title:'เรสซิเดนท์ อีวิล',english:'Resident Evil',poster:'posters/page-6.jpg',genres:'สยองขวัญ',iso:'2026-09-24',date:'24 กันยายน 2569',duration:'95 นาที',status:'กำลังฉาย',synopsis:'คนส่งของผู้โชคร้ายคนหนึ่งต้องเดินทางไปส่งพัสดุยังโรงพยาบาลห่างไกล แต่กลับพบว่าตัวเองติดอยู่ท่ามกลางการแพร่ระบาด และต้องต่อสู้กับสิ่งมีชีวิตกลายพันธุ์เพื่อเอาชีวิตรอด',tone:'green'},
+    {id:'lalisa',title:'Always Lalisa',english:'Always Lalisa',poster:'posters/page-2.jpg',genres:'สารคดี / เพลง',iso:'2026-10-12',date:'12 ตุลาคม 2569',duration:'100 นาที',status:'เข้าฉายวันนี้',synopsis:'ภาพยนตร์สารคดีที่ติดตามชีวิตของ LISA ในช่วงเปลี่ยนผ่านสู่การเป็นศิลปินเดี่ยว เผยให้เห็นการทำงานเบื้องหลัง การสร้างอัลบั้ม Alter Ego ความท้าทายในการสร้างตัวตนทางดนตรี และเส้นทางการก้าวสู่เวทีระดับโลก',tone:'violet'},
+    {id:'doraemon',title:'โดราเอมอน เดอะ มูฟวี่ ใหม่ ตะลุยปราสาทใต้สมุทรของโนบิตะ',english:'Doraemon: Nobita and the New Castle of the Undersea Devil',poster:'posters/page-4.jpg',genres:'ผจญภัย / แอนิเมชัน / ตลก / แฟนตาซี / ไซไฟ',iso:'2026-10-08',date:'8 ตุลาคม 2569',duration:'102 นาที',status:'กำลังฉาย',synopsis:'โนบิตะและผองเพื่อนค้นพบปราสาทลึกลับใต้มหาสมุทรที่เต็มไปด้วยความลับและสมบัติ พวกเขาใช้เครื่องมือวิเศษของโดราเอมอนออกเดินทางผจญภัยในโลกใต้ทะเล พร้อมเผชิญความท้าทายที่ต้องอาศัยความกล้าหาญและการร่วมมือกัน',tone:'blue'},
+    {id:'street-fighter',title:'สตรีท ไฟเตอร์',english:'Street Fighter',poster:'posters/page-25.jpg',genres:'แอ็กชัน / ผจญภัย',iso:'2026-10-15',date:'15 ตุลาคม 2569',status:'โปรแกรมหน้า',synopsis:'ริวและเคนกลับมาพบกันอีกครั้ง เมื่อชุนลีชักชวนให้ทั้งคู่เข้าร่วมการแข่งขันต่อสู้ระดับโลก ก่อนจะค้นพบแผนสมคบคิดที่ทำให้พวกเขาต้องเผชิญหน้ากับอดีตของตัวเอง',tone:'gold'},
+    {id:'whalefall',title:'ต้องรอดจากวาฬนี้',english:'Whalefall',poster:'posters/page-26.jpg',genres:'ระทึกขวัญ / ผจญภัย / ดราม่า',iso:'2026-10-15',date:'15 ตุลาคม 2569',duration:'106 นาที',status:'โปรแกรมหน้า',synopsis:'นักดำน้ำคนหนึ่งถูกวาฬสเปิร์มกลืนลงไปในท้อง เขามีเวลาเพียงหนึ่งชั่วโมงในการหาทางหนีออกมา ก่อนที่ออกซิเจนจะหมดลง',tone:'blue'},
+    {id:'verity',title:'เงื่อนวิปลาส',english:'Verity',poster:'posters/page-24.jpg',genres:'ดราม่า / ระทึกขวัญ / อาชญากรรม',iso:'2026-10-01',date:'1 ตุลาคม 2569',duration:'118 นาที',status:'เพิ่งเข้าฉาย',synopsis:'นักเขียนสาวได้รับมอบหมายให้เขียนหนังสือต่อจากนักเขียนชื่อดังที่ประสบอุบัติเหตุ แต่เมื่อเข้าไปอยู่ในบ้านของครอบครัวนั้น เธอกลับค้นพบความลับที่น่าสะพรึงกลัว',tone:'violet'},
+    {id:'wife-out',title:'Wife Out',english:'Wife Out',poster:'',genres:'รอการยืนยันข้อมูลประเภทหนัง',iso:'2026-10-15',date:'15 ตุลาคม 2569',status:'โปรแกรมหน้า',synopsis:'รอรายละเอียดเรื่องย่อจากผู้จัดจำหน่าย',tone:'violet'},
+    {id:'pee-buek',title:'พี่บึ้ก… โคตรคน ชนนรก',english:'พี่บึ้ก… โคตรคน ชนนรก',poster:'',genres:'แอ็กชัน / ตลก / ระทึกขวัญ',iso:'2026-10-15',date:'15 ตุลาคม 2569',status:'โปรแกรมหน้า',synopsis:'รอรายละเอียดเรื่องย่อฉบับทางการ',tone:'gold'},
+    {id:'social-reckoning',title:'เปิดโปงโซเชียล',english:'The Social Reckoning',poster:'posters/page-29.jpg',genres:'ดราม่า',iso:'2026-10-22',date:'22 ตุลาคม 2569',status:'โปรแกรมหน้า',synopsis:'เรื่องราวเกี่ยวกับการเปิดเผยข้อมูลและความลับในบริษัทโซเชียลมีเดียขนาดใหญ่',tone:'blue'},
+    {id:'nakee-3',title:'นาคี 3 ครุฑา นาคี',english:'นาคี 3 ครุฑา นาคี',poster:'posters/page-30.jpg',genres:'แอ็กชัน / แฟนตาซี / โรแมนติก / ดราม่า',iso:'2026-10-22',date:'22 ตุลาคม 2569',status:'โปรแกรมหน้า',synopsis:'เรื่องราวความขัดแย้งระหว่างครุฑและพญานาคที่ดำเนินมายาวนาน พร้อมความรักต้องห้ามที่อาจเปลี่ยนแปลงชะตากรรมของทั้งสองเผ่าพันธุ์',tone:'gold'},
+    {id:'clayface',title:'เคลย์เฟซ',english:'Clayface',poster:'posters/page-28.jpg',genres:'สยองขวัญ / ไซไฟ / อาชญากรรม',iso:'2026-10-22',date:'22 ตุลาคม 2569',status:'โปรแกรมหน้า',synopsis:'เรื่องราวของนักแสดงที่เปลี่ยนแปลงไปเป็นสิ่งมีชีวิตประหลาด พร้อมประเด็นเกี่ยวกับการสูญเสียตัวตนและความทะเยอทะยาน',tone:'green'},
+    {id:'look-back',title:'ลุค แบ็ค',english:'Look Back',poster:'posters/page-27.jpg',genres:'ดราม่า',iso:'2026-10-29',date:'29 ตุลาคม 2569',status:'โปรแกรมหน้า',synopsis:'เด็กสาวสองคนที่มีความฝันในการวาดมังงะเหมือนกันได้พบกัน และร่วมเดินทางไล่ตามความฝัน ท่ามกลางมิตรภาพ ความสูญเสีย และการเติบโต',tone:'blue'},
+    {id:'intern',title:'อินเทิร์น',english:'Intern',poster:'posters/page-31.jpg',genres:'ตลก / ดราม่า',iso:'2026-10-29',date:'29 ตุลาคม 2569',status:'โปรแกรมหน้า',synopsis:'ซีอีโอสาวแห่งบริษัทแฟชั่นได้พบกับพนักงานฝึกหัดรุ่นใหญ่ที่มีประสบการณ์ทำงานยาวนาน นำไปสู่เรื่องราวการทำงานและมุมมองชีวิตระหว่างคนต่างวัย',tone:'gold'},
+    {id:'avengers-doomsday',title:'Avengers: Doomsday',english:'Avengers: Doomsday',poster:'',genres:'แอ็กชัน / ไซไฟ',iso:'2026-12-01',date:'รอการยืนยัน',status:'โปรแกรมหน้า',synopsis:'รายการภาพยนตร์สำหรับข้อมูลตั๋วตัวอย่าง วันฉายจริงต้องตรวจสอบอีกครั้ง',tone:'gold'}
+  ];
+  const newsData=[
+    {id:'spotlight',title:'Thealist Spotlight: Stories That Stay With You',category:'Movie News',date:'2026-10-10',excerpt:'สำรวจเสน่ห์ของการดูหนังบนจอใหญ่',body:'โรงภาพยนตร์เป็นพื้นที่ที่แสง เสียง และผู้ชมร่วมกันสร้างความทรงจำ\n\nบทความตัวอย่างนี้ไม่ใช่รายงานข่าวที่ตรวจสอบแล้ว',tone:'gold'},
+    {id:'october',title:'October Preview: Films to Watch Next',category:'Upcoming Movies',date:'2026-10-08',excerpt:'วางแผนติดตามโปรแกรมหนังเดือนตุลาคม',body:'ใช้รายการนี้เป็นแนวทางวางแผนเท่านั้น ตารางฉายต้องตรวจสอบอีกครั้ง',tone:'blue'},
+    {id:'cinema-experience',title:'What Makes a Great Cinema Experience?',category:'Reviews',date:'2026-10-06',excerpt:'ภาพ เสียง และบรรยากาศที่ทำให้การชมภาพยนตร์พิเศษ',body:'นี่เป็นบทความรีวิวเชิงแนวคิดสำหรับสาธิต ไม่ใช่การประเมินภาพยนตร์จริง',tone:'green'},
+    {id:'craft',title:'Behind the Screen: The Craft of Modern Cinema',category:'Entertainment',date:'2026-10-04',excerpt:'เบื้องหลังภาพหนึ่งเฟรมมีการทำงานร่วมกันมากมาย',body:'เนื้อหาตัวอย่างเกี่ยวกับกระบวนการสร้างภาพยนตร์',tone:'gold'},
+    {id:'global-watchlist',title:'Global Box Office Watchlist',category:'Box Office',date:'2026-10-02',excerpt:'วิธีอ่านอันดับรายได้ภาพยนตร์ตัวอย่าง',body:'ข้อมูลรายได้ตัวอย่างไม่ใช่ยอดล่าสุดที่ยืนยันแล้ว',tone:'blue'},
+    {id:'top-grossing',title:'10 อันดับหนังทำรายได้สูงสุดตลอดกาลทั่วโลก',category:'Box Office',date:'2026-10-13',excerpt:'อันดับภาพยนตร์ทั่วโลกในรูปแบบ Demo Data',body:'อันดับตัวอย่าง: Avengers: Endgame, Avatar, Avatar: The Way of Water, Titanic, Ne Zha 2, Star Wars: The Force Awakens, Avengers: Infinity War, Spider-Man: No Way Home, Zootopia 2 และ Inside Out 2\n\nโปรดตรวจสอบยอดและลำดับล่าสุดก่อนเผยแพร่',tone:'gold'},
+    {id:'movie-night',title:'Thealist Guide: Choose Your Next Movie Night',category:'Movie News',date:'2026-09-29',excerpt:'เลือกหนังให้เหมาะกับค่ำคืนนี้',body:'บทความตัวอย่างนี้ชวนเลือกหนังจากอารมณ์และแนวเรื่อง',tone:'green'}
+  ];
+
+  // Booking data belongs to the demo service, never to editable presentation config.
+  const bookingData=[
+    {userId:'demo-user-1',bookingId:'THEA-2026-001',movieId:'lalisa',movieTitle:'Always Lalisa',moviePoster:null,cinemaName:'Thealist Central',cinemaLocation:'Bangkok',screeningDate:'2026-10-15',showtime:'19:30',screenNumber:'4',seats:['A12','A13'],price:720,ticketQuantity:2,bookingStatus:'Confirmed',paymentStatus:'Demo payment — confirmed',qrValue:'DEMO-QR-THEA-001',refundStatus:'Demo refund status: not requested',cancellationAllowed:true},
+    {userId:'demo-user-1',bookingId:'THEA-2026-002',movieId:'street-fighter',movieTitle:'Street Fighter',moviePoster:null,cinemaName:'Thealist Riverside',cinemaLocation:'Bangkok',screeningDate:'2026-10-18',showtime:'20:00',screenNumber:'2',seats:['C08'],price:360,ticketQuantity:1,bookingStatus:'Pending',paymentStatus:'Demo payment — pending',qrValue:'DEMO-QR-THEA-002',refundStatus:'Demo refund status: not requested',cancellationAllowed:true},
+    {userId:'demo-user-1',bookingId:'THEA-2026-003',movieId:'whalefall',movieTitle:'Whalefall',moviePoster:null,cinemaName:'Thealist Central',cinemaLocation:'Bangkok',screeningDate:'2026-10-05',showtime:'18:00',screenNumber:'1',seats:['B05','B06'],price:720,ticketQuantity:2,bookingStatus:'Confirmed',paymentStatus:'Demo payment — confirmed',qrValue:'DEMO-QR-THEA-003',refundStatus:'Demo refund status: not requested',cancellationAllowed:false},
+    {userId:'demo-user-1',bookingId:'THEA-2026-004',movieId:'avengers-doomsday',movieTitle:'Avengers: Doomsday',moviePoster:null,cinemaName:'Thealist Grand',cinemaLocation:'Bangkok',screeningDate:'2026-10-10',showtime:'21:00',screenNumber:'5',seats:['D10'],price:360,ticketQuantity:1,bookingStatus:'Cancelled',paymentStatus:'Demo payment — no real payment',qrValue:'DEMO-QR-THEA-004',refundStatus:'Demo refund status: pending review',cancellationAllowed:false},
+    {userId:'other-demo-user',bookingId:'OTHER-PRIVATE-001',movieId:'lalisa',movieTitle:'Always Lalisa',moviePoster:null,cinemaName:'Private Cinema',cinemaLocation:'Bangkok',screeningDate:'2026-10-19',showtime:'19:00',screenNumber:'8',seats:['F01'],price:360,ticketQuantity:1,bookingStatus:'Confirmed',paymentStatus:'Demo payment — confirmed',qrValue:'OTHER-PRIVATE-QR',refundStatus:'Demo refund status: not requested',cancellationAllowed:false}
+  ];
+  const currentUser={id:null};
+  const state={view:'home',movieTab:'now',movie:null,newsCategory:'All',ranking:'worldwide',ticketTab:'Upcoming',tickets:[],ticketId:null,cancelId:null,modal:null,returnFocus:null,ticketRequest:0};
+  // Future API adapter can replace these methods. No network request is made.
+  const bookingService={
+    list:()=>new Promise(resolve=>setTimeout(()=>resolve(bookingData.map(row=>({...row,seats:[...row.seats]}))),420)),
+    cancel:id=>{const row=bookingData.find(item=>item.bookingId===id&&item.userId===currentUser.id);if(!row)throw Error('Unavailable');row.bookingStatus='Cancelled';row.cancellationAllowed=false;row.refundStatus='Demo refund status: pending review';row.paymentStatus='Demo transaction — no real payment processed';return {...row,seats:[...row.seats]}}
+  };
+  const movieById=id=>catalog.find(movie=>movie.id===id);
+  const dateText=iso=>new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(iso+'T12:00:00Z'));
+  const ticketGroup=row=>row.bookingStatus==='Cancelled'?'Cancelled':row.screeningDate<referenceDate?'Past':'Upcoming';
+  const ownedTickets=()=>currentUser.id?state.tickets.filter(row=>row.userId===currentUser.id):[];
+  const canCancel=row=>row.cancellationAllowed&&row.bookingStatus!=='Cancelled'&&row.screeningDate>=referenceDate;
+  function notify(message){const toast=$('toast');toast.textContent=message;toast.classList.remove('hidden');clearTimeout(notify.timer);notify.timer=setTimeout(()=>toast.classList.add('hidden'),4000)}
+  function badge(){return element('span','Demo Data','demo-badge')}
+  function makePoster(movie,large=false){
+    const poster=element('div','','poster rounded-xl '+(large?'w-full max-w-[380px] mx-auto':'rounded-b-none'));
+    poster.dataset.tone=movie.tone||'gold';
+    if(movie.poster){
+      const img=element('img','','poster-image');
+      img.src=movie.poster;img.alt='โปสเตอร์ภาพยนตร์ '+movie.title;
+      img.loading='lazy';img.decoding='async';
+      poster.append(img);
+    }else{
+      poster.setAttribute('role','img');poster.setAttribute('aria-label','ยังไม่มีโปสเตอร์ทางการ: '+movie.english);
+      const inner=element('div','','poster-inner');inner.append(element('span','THEALIST','eyebrow'),element('div',movie.english,'poster-title my-3'),element('span','ยังไม่มีภาพในไฟล์แนบ','text-xs tracking-widest'));poster.append(inner);
+    }
+    return poster;
+  }
+  function movieCard(movie){
+    const card=element('article','','card flex flex-col');card.dataset.id=movie.id;card.append(makePoster(movie));
+    const body=element('div','','p-5 flex flex-col flex-1 gap-3');
+    body.append(element('h3',movie.title,'font-bold text-lg leading-tight'),element('p',movie.english,'text-sm text-[#aaa]'),element('p',movie.genres,'text-sm text-[#ffd700]'),element('p','วันเข้าฉาย: '+movie.date,'text-sm text-[#ccc]'),element('p','สถานะ: '+movie.status,'text-sm text-[#bbb]'));
+    const button=element('button','ดูเพิ่มเติม','btn-outline w-full py-2.5 mt-auto text-sm font-bold');button.type='button';button.addEventListener('click',event=>{event.stopPropagation();navigate('detail',movie.id)});
+    card.tabIndex=0;card.setAttribute('aria-label','ดูรายละเอียด '+movie.title);card.addEventListener('click',()=>navigate('detail',movie.id));card.addEventListener('keydown',event=>{if(event.target===card&&['Enter',' '].includes(event.key)){event.preventDefault();navigate('detail',movie.id)}});body.append(button);card.append(body);return card;
+  }
+  function reconcileCards(host,items,key,create){
+    const wanted=new Set(items.map(item=>item[key]));[...host.children].forEach(node=>{if(!wanted.has(node.dataset.id))node.remove()});
+    items.forEach((item,index)=>{let node=[...host.children].find(child=>child.dataset.id===item[key]);if(!node)node=create(item);if(host.children[index]!==node)host.insertBefore(node,host.children[index]||null)});
+  }
+  function renderMovies(){
+    const q=$('movie-search').value.trim().toLocaleLowerCase(),genre=$('genre-filter').value;
+    const rows=catalog.filter(movie=>(movie.iso<=referenceDate?'now':'upcoming')===state.movieTab&&(genre==='all'||movie.genres.split(' / ').includes(genre))&&(!q||[movie.title,movie.english,movie.genres,movie.synopsis].join(' ').toLocaleLowerCase().includes(q))).sort((a,b)=>a.iso.localeCompare(b.iso));
+    reconcileCards($('movies-grid'),rows,'id',movieCard);$('result-count').textContent='Demo Data · '+rows.length+' เรื่อง';$('movie-empty').classList.toggle('hidden',!!rows.length);
+  }
+  function renderMovieDetail(movie){
+    const layout=element('div','','grid md:grid-cols-[minmax(230px,360px)_minmax(0,1fr)] gap-8 lg:gap-14 items-start');layout.append(makePoster(movie,true));
+    const content=element('div','');content.append(element('p','MOVIE DETAIL · DEMO DATA','eyebrow mb-3'),element('h1',movie.title,'font-extrabold leading-tight text-3xl sm:text-5xl'),element('p',movie.english,'text-[#ddd] text-lg mt-3'),element('p',movie.genres,'text-[#ffd700] mt-5'),element('p','วันเข้าฉาย: '+movie.date,'text-[#bbb] mt-3'),element('p','ความยาว: '+(movie.duration||'รอการยืนยัน')+' · สถานะ: '+movie.status,'text-[#bbb] mt-2'),element('h2','เรื่องย่อ','text-2xl font-bold mt-8 mb-3'),element('p',movie.synopsis,'leading-relaxed text-[#ccc]'));
+    const trailer=element('div','Trailer placeholder / Demo','mt-8 rounded-xl border border-[#444] bg-[#161616] min-h-[150px] grid place-items-center text-[#aaa] font-bold');content.append(trailer);
+    const book=element('button','Book Tickets','btn-red px-7 py-4 mt-7');book.type='button';book.addEventListener('click',()=>openModal('booking-modal'));content.append(book,element('p','Demo Mode · ไม่มีการจองหรือชำระเงินจริง','text-xs text-[#aaa] mt-3'));layout.append(content);$('detail-content').replaceChildren(layout);
+  }
+  function newsCard(item){
+    const card=element('article','','card flex flex-col');card.dataset.id=item.id;
+    const cover=element('div','','news-cover');cover.append(element('span','COVER PLACEHOLDER · DEMO DATA','eyebrow'));card.append(cover);
+    const body=element('div','','p-5 flex flex-col flex-1 gap-3');body.append(badge(),element('p',item.category+' · '+dateText(item.date),'text-xs text-[#aaa]'),element('h2',item.title,'font-bold text-xl'),element('p',item.excerpt,'text-sm text-[#ccc] leading-relaxed'));
+    const button=element('button','Read More →','btn-outline px-4 py-2.5 mt-auto self-start');button.type='button';button.addEventListener('click',()=>navigate('news-detail',item.id));body.append(button);card.append(body);return card;
+  }
+  function renderNews(){
+    const q=$('news-search').value.trim().toLocaleLowerCase();const rows=newsData.filter(item=>(state.newsCategory==='All'||item.category===state.newsCategory)&&(!q||[item.title,item.excerpt,item.body].join(' ').toLocaleLowerCase().includes(q)));
+    reconcileCards($('news-grid'),rows,'id',newsCard);$('news-result-count').textContent='Demo Data · '+rows.length+' รายการ';$('news-empty').classList.toggle('hidden',!!rows.length);
+    document.querySelectorAll('[data-category]').forEach(button=>{const active=button.dataset.category===state.newsCategory;button.setAttribute('aria-pressed',String(active));button.style.borderColor=active?'#ffd700':''});
+  }
+  function renderArticle(id){
+    const item=newsData.find(row=>row.id===id);if(!item){navigate('news');return}
+    const article=element('article','','max-w-4xl');article.append(element('p','THEALIST / EDITORIAL · DEMO DATA','eyebrow mb-4'),badge(),element('h1',item.title,'font-extrabold text-3xl sm:text-5xl leading-tight mt-6'),element('p',item.category+' · '+dateText(item.date)+' · วันที่ตัวอย่าง','text-[#aaa] mt-4'));
+    const cover=element('div','COVER PLACEHOLDER · DEMO DATA','news-cover rounded-2xl mt-8 text-[#ffd700]');cover.style.minHeight='300px';article.append(cover,element('p',item.excerpt,'text-lg mt-8'),element('p',item.body,'whitespace-pre-line text-[#ccc] leading-loose mt-6'),element('p','ข้อมูลตัวอย่าง โปรดตรวจสอบกับแหล่งข้อมูลจริงก่อนเผยแพร่','text-sm text-[#aaa] mt-6'));
+    const share=element('button','Share · Demo','btn-outline px-5 py-2.5 mt-7');share.type='button';share.addEventListener('click',()=>notify('Demo share action'));article.append(share);$('news-detail-content').replaceChildren(article);
+  }
+  function renderRanking(){
+    document.querySelectorAll('[data-ranking]').forEach(button=>{const active=button.dataset.ranking===state.ranking;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active))});
+    const list=$('ranking-list');if(state.ranking!=='worldwide'){list.replaceChildren(element('p','Not available · ยังไม่มีข้อมูลตัวอย่างสำหรับโหมดนี้','py-8 text-[#bbb]'));return}
+    const rankings=[
+      {title:'Avengers: Endgame',year:'2019',gross:'ประมาณ 2,799 ล้านดอลลาร์สหรัฐ',genre:'แอ็กชัน / ผจญภัย / ไซไฟ',synopsis:'เหล่าอเวนเจอร์สที่เหลืออยู่ร่วมมือกันเพื่อแก้ไขความสูญเสียจากเหตุการณ์ที่ธานอสทำให้สิ่งมีชีวิตครึ่งจักรวาลหายไป'},
+      {title:'Avatar',year:'2009',gross:'ประมาณ 2,924 ล้านดอลลาร์สหรัฐ',genre:'ไซไฟ / ผจญภัย / แฟนตาซี',synopsis:'อดีตนาวิกโยธินเดินทางไปยังดาวแพนดอราและเข้าไปพัวพันกับความขัดแย้งระหว่างมนุษย์กับชาวนาวี'},
+      {title:'Avatar: The Way of Water',year:'2022',gross:'ประมาณ 2,320 ล้านดอลลาร์สหรัฐ',genre:'ไซไฟ / ผจญภัย',synopsis:'เจค ซัลลีและครอบครัวต้องออกเดินทางเพื่อหาที่หลบภัยและเผชิญหน้ากับภัยคุกคามบนดาวแพนดอรา'},
+      {title:'Titanic',year:'1997',gross:'ประมาณ 2,265 ล้านดอลลาร์สหรัฐ',genre:'โรแมนติก / ดราม่า',synopsis:'ความรักระหว่างแจ็กและโรสเกิดขึ้นบนเรือไททานิก ก่อนโศกนาฏกรรมครั้งใหญ่จะเปลี่ยนชีวิตของทั้งคู่ไปตลอดกาล'},
+      {title:'Ne Zha 2',year:'2025',gross:'ประมาณ 2,215 ล้านดอลลาร์สหรัฐ',genre:'แอนิเมชัน / แฟนตาซี / แอ็กชัน',synopsis:'นาจาและเอ๋าปิ่งต้องเผชิญบททดสอบครั้งใหม่เพื่อปกป้องชะตากรรมของตนเองและผู้คนรอบตัว'},
+      {title:'Star Wars: The Force Awakens',year:'2015',gross:'ประมาณ 2,071 ล้านดอลลาร์สหรัฐ',genre:'ไซไฟ / ผจญภัย / แอ็กชัน',synopsis:'เรย์ ฟินน์ และพันธมิตรต้องร่วมต่อสู้กับปฐมภาคี พร้อมค้นหาความหวังใหม่ให้กับกาแล็กซี'},
+      {title:'Avengers: Infinity War',year:'2018',gross:'ประมาณ 2,052 ล้านดอลลาร์สหรัฐ',genre:'แอ็กชัน / ไซไฟ / ผจญภัย',synopsis:'เหล่าฮีโร่ต้องรวมพลังกันหยุดยั้งธานอสที่ออกตามหาอินฟินิตี้สโตนเพื่อเปลี่ยนแปลงจักรวาล'},
+      {title:'Spider-Man: No Way Home',year:'2021',gross:'ประมาณ 1,923 ล้านดอลลาร์สหรัฐ',genre:'แอ็กชัน / ผจญภัย / ซูเปอร์ฮีโร่',synopsis:'ปีเตอร์ พาร์กเกอร์ขอความช่วยเหลือจากด็อกเตอร์สเตรนจ์ แต่เวทมนตร์กลับทำให้เกิดความผิดปกติที่ส่งผลต่อหลายจักรวาล'},
+      {title:'Zootopia 2',year:'2025',gross:'ต้องตรวจสอบยอดล่าสุดจากฐานข้อมูลรายได้ภาพยนตร์',genre:'แอนิเมชัน / ผจญภัย / ตลก',synopsis:'จูดี้ ฮอปส์และนิค ไวลด์กลับมาร่วมไขคดีปริศนาครั้งใหม่ในมหานครซูโทเปีย'},
+      {title:'Inside Out 2',year:'2024',gross:'ประมาณ 1,699 ล้านดอลลาร์สหรัฐ',genre:'แอนิเมชัน / ครอบครัว / ตลก',synopsis:'ไรลีย์เติบโตเข้าสู่วัยรุ่นและต้องรับมือกับอารมณ์ใหม่ ๆ ที่เข้ามาเปลี่ยนแปลงโลกภายในจิตใจของเธอ'}
+    ];
+    list.replaceChildren(...rankings.map((item,i)=>{const row=element('button','','w-full text-left flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-5 py-5 hover:text-[#ffd700]');row.type='button';const rank=element('strong',String(i+1).padStart(2,'0'),'text-[#ffd700] shrink-0');const content=element('div','','min-w-0');content.append(element('h3',item.title+' ('+item.year+')','font-bold text-lg'),element('p','รายได้ทั่วโลก: '+item.gross,'text-[#ffd700] mt-1'),element('p','ประเภท: '+item.genre,'text-sm text-[#ccc] mt-1'),element('p','เรื่องย่อ: '+item.synopsis,'text-sm text-[#bbb] leading-relaxed mt-2'));row.append(rank,content);row.addEventListener('click',()=>navigate('news-detail','top-grossing'));return row}));
+  }
+  function ticketPoster(row,large=false){
+    const box=element('div','','ticket-poster rounded-xl flex flex-col justify-end p-4 shrink-0 '+(large?'w-full sm:w-48 min-h-64':'w-24 sm:w-32 min-h-40'));
+    box.setAttribute('role','img');box.setAttribute('aria-label','โปสเตอร์ภาพยนตร์ '+row.movieTitle);
+    const match=catalog.find(movie=>movie.title===row.movieTitle||movie.english===row.movieTitle);
+    if(match&&match.poster){
+      box.style.position='relative';box.style.overflow='hidden';box.style.padding='0';
+      const img=element('img','','ticket-poster-image');img.src=match.poster;img.alt='โปสเตอร์ภาพยนตร์ '+row.movieTitle;img.loading='lazy';img.style.cssText='width:100%;height:100%;position:absolute;inset:0;object-fit:cover;border-radius:inherit';
+      box.append(img);
+    }else{
+      box.append(element('strong',row.movieTitle,'text-sm mt-2 leading-tight break-words'));
+    }
+    return box;
+  }
+  function detailLine(label,value){const line=element('div','','flex justify-between gap-4 border-b border-[#383838] py-3');line.append(element('span',label,'text-[#aaa]'),element('strong',String(value),'text-right break-words'));return line}
+  function TicketCard(row){
+    const card=element('article','','ticket cursor-pointer');card.dataset.id=row.bookingId;card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-label','Open Demo ticket details: '+row.movieTitle+', '+row.bookingStatus);
+    const upper=element('div','','flex gap-4 sm:gap-6 p-5 sm:p-6');upper.append(ticketPoster(row));
+    const info=element('div','','min-w-0 flex-1');info.append(badge(),element('h3',row.movieTitle,'font-bold text-xl sm:text-2xl mt-3'),element('p',row.cinemaName+' · '+row.cinemaLocation,'text-[#ccc] text-sm mt-2'),element('p',dateText(row.screeningDate)+' · '+row.showtime,'text-[#ffd700] font-bold mt-4'),element('p','Screen '+row.screenNumber+' · Seats '+row.seats.join(' / '),'text-sm text-[#ddd] mt-2'));
+    const status=element('span',row.bookingStatus,'ticket-status mt-3');status.dataset.status=row.bookingStatus;info.append(status);upper.append(info);card.append(upper);
+    const stub=element('div','','ticket-stub grid sm:grid-cols-[1fr_auto] gap-5 p-5 sm:px-7');const facts=element('div','','grid grid-cols-2 gap-3 text-sm');facts.append(element('div','Booking ID\n'+row.bookingId,'whitespace-pre-line break-all'),element('div','Tickets\n'+row.ticketQuantity,'whitespace-pre-line'),element('div','Price · Demo\n'+row.price+' THB','whitespace-pre-line text-[#ffd700]'),element('div',row.paymentStatus,'text-[#bbb]'));stub.append(facts);
+    const qr=element('div','','qr-demo sm:min-w-36');qr.append(element('strong','DEMO QR','block text-xl tracking-wider'),element('span','Not valid for entry','block text-xs text-[#ddd] mt-1'));stub.append(qr);card.append(stub);
+    card.addEventListener('click',()=>navigate('ticket-detail',row.bookingId));card.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();navigate('ticket-detail',row.bookingId)}});return card;
+  }
+  function renderTicketFilters(){
+    const select=$('ticket-movie'),selected=select.value;select.replaceChildren(new Option('All movies',''),...[...new Set(ownedTickets().map(row=>row.movieTitle))].sort().map(title=>new Option(title,title)));select.value=selected;
+  }
+  function renderTickets(){
+    if(!currentUser.id)return;
+    const rows=ownedTickets(),counts={Upcoming:0,Past:0,Cancelled:0};rows.forEach(row=>counts[ticketGroup(row)]++);
+    Object.keys(counts).forEach(group=>{$('summary-'+group.toLowerCase()).textContent=counts[group]});
+    document.querySelectorAll('[data-ticket-tab]').forEach(tab=>{const active=tab.dataset.ticketTab===state.ticketTab;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active))});
+    const q=$('ticket-search').value.trim().toLocaleLowerCase(),movie=$('ticket-movie').value,date=$('ticket-date').value,status=$('ticket-status').value,latest=$('ticket-sort').value==='latest';
+    const matches=rows.filter(row=>ticketGroup(row)===state.ticketTab&&(!q||[row.movieTitle,row.cinemaName,row.cinemaLocation,row.bookingId].join(' ').toLocaleLowerCase().includes(q))&&(!movie||row.movieTitle===movie)&&(!date||row.screeningDate===date)&&(!status||row.bookingStatus===status)).sort((a,b)=>(latest?b.screeningDate.localeCompare(a.screeningDate):a.screeningDate.localeCompare(b.screeningDate))||a.showtime.localeCompare(b.showtime));
+    reconcileCards($('ticket-list'),matches,'bookingId',TicketCard);
+    $('ticket-count').textContent=state.ticketTab+' · '+matches.length+' tickets · Demo Data';
+    $('tickets-empty').classList.toggle('hidden',!!matches.length);
+    $('tickets-empty-context').textContent=matches.length?'':counts[state.ticketTab]?'No tickets match these filters. Adjust your search or filters.':'Demo Data · '+state.ticketTab+' has no tickets.';
+  }
+  async function loadTickets(){
+    if(!currentUser.id)return;
+    const request=++state.ticketRequest;
+    $('tickets-error').classList.add('hidden');$('tickets-content').classList.add('hidden');$('tickets-loading').classList.remove('hidden');
+    try{
+      const rows=await bookingService.list();
+      if(request!==state.ticketRequest||!currentUser.id)return;
+      state.tickets=rows.filter(row=>row.userId===currentUser.id);renderTicketFilters();
+      $('tickets-loading').classList.add('hidden');$('tickets-content').classList.remove('hidden');renderTickets();
+    }catch{
+      if(request!==state.ticketRequest)return;
+      $('tickets-loading').classList.add('hidden');$('tickets-error').classList.remove('hidden');
+    }
+  }
+  function renderTicketAccess(){
+    const signedIn=!!currentUser.id;$('tickets-login').classList.toggle('hidden',signedIn);$('tickets-private').classList.toggle('hidden',!signedIn);
+    $('demo-sign-in').classList.toggle('hidden',signedIn);$('demo-sign-out').classList.toggle('hidden',!signedIn);
+    if(signedIn)loadTickets();
+  }
+  function TicketDetails(row){
+    const wrapper=element('article','','ticket max-w-5xl mx-auto');
+    const top=element('div','','p-6 sm:p-9 flex flex-col sm:flex-row gap-7');top.append(ticketPoster(row,true));
+    const heading=element('div','','flex-1 min-w-0');heading.append(badge(),element('p','PERSONAL CINEMA TICKET / DEMO MODE','eyebrow mt-5'),element('h1',row.movieTitle,'font-extrabold text-3xl sm:text-4xl mt-3'),element('p',row.cinemaName+' · '+row.cinemaLocation,'text-[#ddd] mt-3'));
+    const status=element('span',row.bookingStatus,'ticket-status mt-5');status.dataset.status=row.bookingStatus;heading.append(status,element('p','QR Code กับ Booking ID เป็นข้อมูลส่วนตัวของผู้ใช้','text-xs text-[#aaa] mt-5'));top.append(heading);wrapper.append(top);
+    const lower=element('div','','ticket-stub p-6 sm:p-9');const grid=element('div','','grid md:grid-cols-2 gap-x-10');[
+      ['Screening date',dateText(row.screeningDate)],['Showtime',row.showtime],['Screen',row.screenNumber],['Seats',row.seats.join(' / ')],
+      ['Booking ID',row.bookingId],['Ticket quantity',row.ticketQuantity],['Price · Demo',row.price+' THB'],['Total paid · Demo',row.price+' THB'],
+      ['Payment status',row.paymentStatus],['Refund status',row.refundStatus]
+    ].forEach(pair=>grid.append(detailLine(...pair)));lower.append(grid);
+    lower.append(element('p','Demo transaction — no real payment processed','text-[#ffd700] text-sm mt-6'));
+    const qr=element('div','','qr-demo mt-7');qr.append(element('strong','DEMO QR','block text-3xl tracking-widest'),element('p','Not valid for entry','mt-2 text-white font-bold'),element('p','Decorative demo area only · no scannable code','text-xs text-[#bbb] mt-2'));lower.append(qr);
+    const actions=element('div','','flex flex-wrap gap-3 mt-8');
+    const action=(text,classes,handler)=>{const b=element('button',text,classes+' px-5 py-3');b.type='button';b.addEventListener('click',handler);actions.append(b)};
+    action('Download Ticket','btn-red',()=>notify('Demo ticket download'));
+    action('Add to Calendar','btn-outline',()=>notify('Demo calendar action'));
+    action('View Movie Details','btn-outline',()=>navigate('detail',row.movieId));
+    if(canCancel(row))action('Cancel Booking','btn-outline',()=>{state.cancelId=row.bookingId;$('cancel-booking-summary').textContent=row.movieTitle+' · '+row.bookingId+' · '+dateText(row.screeningDate);openModal('cancel-modal')});
+    else lower.append(element('p',row.bookingStatus==='Cancelled'?'Cancellation unavailable: this Demo booking is already cancelled.':'Cancellation unavailable: this screening has passed or cancellation is not allowed.','text-sm text-[#aaa] mt-6'));
+    lower.append(actions);wrapper.append(lower);return wrapper;
+  }
+  function renderTicketDetail(id){
+    const row=ownedTickets().find(item=>item.bookingId===id);
+    if(!row){navigate('tickets');return}
+    $('ticket-detail-content').replaceChildren(TicketDetails(row));
+  }
+  function navigate(view,id){
+    closeModal();$('mobile-menu').classList.add('hidden');$('mobile-toggle').setAttribute('aria-expanded','false');
+    if(view==='detail'){const movie=movieById(id);if(!movie)return;state.movie=movie;renderMovieDetail(movie)}
+    if(view==='ticket-detail'&&!currentUser.id)view='tickets';
+    state.view=view;
+    ['home','movies','detail','news','news-detail','tickets','ticket-detail','docs'].forEach(name=>$(name+'-view').classList.toggle('hidden',name!==view));
+    ['home','movies','news','tickets'].forEach(name=>{const node=document.querySelector('[data-template-id="nav-'+name+'"]');node.classList.toggle('active',view===name||(name==='movies'&&view==='detail')||(name==='news'&&view==='news-detail')||(name==='tickets'&&view==='ticket-detail'))});
+    if(view==='movies')renderMovies();if(view==='news')renderNews();if(view==='news-detail')renderArticle(id);
+    if(view==='tickets')renderTicketAccess();if(view==='ticket-detail'){state.ticketId=id;renderTicketDetail(id)}
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function openModal(id){
+    if(state.modal)closeModal();state.returnFocus=document.activeElement;state.modal=$(id);state.modal.classList.remove('hidden');document.body.style.overflow='hidden';
+    if(id==='booking-modal'){$('booking-movie').textContent=state.movie.title;updateBookingSummary()}
+    if(id==='auth-modal'){$('demo-sign-in').classList.toggle('hidden',!!currentUser.id);$('demo-sign-out').classList.toggle('hidden',!currentUser.id)}
+    state.modal.querySelector('[data-close-modal]').focus();
+  }
+  function closeModal(){if(!state.modal)return;state.modal.classList.add('hidden');state.modal=null;document.body.style.overflow='';if(state.returnFocus?.isConnected)state.returnFocus.focus();state.returnFocus=null}
+  function updateBookingSummary(){$('booking-summary').textContent=$('showtime').value+' · '+$('ticket-quantity').value+' บัตร · ไม่มีราคาและที่นั่งจริง'}
+  function showInfo(title,text){$('info-title').textContent=title;$('info-text').textContent=text;openModal('info-modal')}
+  document.addEventListener('DOMContentLoaded',()=>{
+    ['lalisa','street-fighter','whalefall','doraemon'].forEach(id=>$('recommended-grid').append(movieCard(movieById(id))));
+    [...new Set(catalog.flatMap(movie=>movie.genres.split(' / ')))].sort((a,b)=>a.localeCompare(b,'th')).forEach(genre=>$('genre-filter').append(new Option(genre,genre)));
+    lucide.createIcons();renderRanking();
+    document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>navigate(button.dataset.view)));
+    $('logo').addEventListener('click',()=>navigate('home'));$('header-search').addEventListener('click',()=>{navigate('movies');$('movie-search').focus()});
+    $('mobile-toggle').addEventListener('click',()=>{const open=$('mobile-toggle').getAttribute('aria-expanded')==='true';$('mobile-menu').classList.toggle('hidden',open);$('mobile-toggle').setAttribute('aria-expanded',String(!open))});
+    document.querySelectorAll('[data-movie-tab]').forEach(button=>button.addEventListener('click',()=>{state.movieTab=button.dataset.movieTab;document.querySelectorAll('[data-movie-tab]').forEach(tab=>{const active=tab===button;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active))});renderMovies()}));
+    $('movie-search').addEventListener('input',renderMovies);$('genre-filter').addEventListener('change',renderMovies);
+    $('clear-movie-filters').addEventListener('click',()=>{$('movie-search').value='';$('genre-filter').value='all';renderMovies();$('movie-search').focus()});
+    $('news-search').addEventListener('input',renderNews);
+    document.querySelectorAll('[data-category]').forEach(button=>button.addEventListener('click',()=>{state.newsCategory=button.dataset.category;renderNews()}));
+    document.querySelectorAll('[data-ranking]').forEach(button=>button.addEventListener('click',()=>{state.ranking=button.dataset.ranking;renderRanking()}));
+    [$('auth-open'),$('mobile-auth'),$('tickets-sign-in')].forEach(button=>button.addEventListener('click',()=>openModal('auth-modal')));
+    $('demo-sign-in').addEventListener('click',()=>{currentUser.id='demo-user-1';closeModal();notify('Demo Mode · signed in as a sample user');if(state.view==='tickets')renderTicketAccess()});
+    $('demo-sign-out').addEventListener('click',()=>{currentUser.id=null;state.ticketRequest++;state.tickets=[];state.ticketId=null;closeModal();if(state.view==='ticket-detail')navigate('tickets');else if(state.view==='tickets')renderTicketAccess();notify('Demo Mode · signed out')});
+    document.querySelectorAll('[data-ticket-tab]').forEach(button=>button.addEventListener('click',()=>{state.ticketTab=button.dataset.ticketTab;renderTickets()}));
+    ['ticket-search','ticket-movie','ticket-date','ticket-status','ticket-sort'].forEach(id=>$(id).addEventListener(id==='ticket-search'?'input':'change',renderTickets));
+    $('tickets-retry').addEventListener('click',loadTickets);
+    $('confirm-cancel').addEventListener('click',()=>{
+      const row=ownedTickets().find(item=>item.bookingId===state.cancelId);
+      if(!row||!canCancel(row)){closeModal();notify('Demo cancellation unavailable');return}
+      try{
+        const changed=bookingService.cancel(row.bookingId);const index=state.tickets.findIndex(item=>item.bookingId===changed.bookingId&&item.userId===currentUser.id);
+        if(index>=0)state.tickets[index]=changed;
+        closeModal();if(state.view==='ticket-detail')renderTicketDetail(changed.bookingId);renderTickets();notify('Demo cancellation recorded');
+      }catch{closeModal();notify('Could not record demo cancellation')}
+    });
+    [$('showtime'),$('ticket-quantity')].forEach(control=>control.addEventListener('change',updateBookingSummary));
+    $('booking-form').addEventListener('submit',event=>{event.preventDefault();closeModal();notify('Demo Mode: ทดลองเลือกบัตรเท่านั้น ไม่มีการจองหรือชำระเงินจริง')});
+    document.querySelectorAll('[data-close-modal]').forEach(button=>button.addEventListener('click',closeModal));
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop=>backdrop.addEventListener('mousedown',event=>{if(event.target===backdrop)closeModal()}));
+    document.addEventListener('keydown',event=>{
+      if(event.key==='Escape'){if(state.modal)closeModal();else if(!$('mobile-menu').classList.contains('hidden')){$('mobile-menu').classList.add('hidden');$('mobile-toggle').setAttribute('aria-expanded','false');$('mobile-toggle').focus()}}
+      if(event.key==='Tab'&&state.modal){const focusable=[...state.modal.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled])')].filter(node=>node.offsetParent!==null);if(!focusable.length)return;if(event.shiftKey&&document.activeElement===focusable[0]){event.preventDefault();focusable.at(-1).focus()}else if(!event.shiftKey&&document.activeElement===focusable.at(-1)){event.preventDefault();focusable[0].focus()}}
+    });
+    document.querySelectorAll('.social').forEach(button=>button.addEventListener('click',()=>notify(button.dataset.social+' · Demo Mode: ยังไม่มีบัญชีโซเชียลเชื่อมต่อ')));
+    $('terms-button').addEventListener('click',()=>showInfo('Terms of Service · Demo Mode','เว็บไซต์นี้เป็นต้นแบบสำหรับแสดงการออกแบบเท่านั้น ไม่มีบริการจำหน่ายบัตรหรือธุรกรรมจริง'));
+    $('privacy-button').addEventListener('click',()=>showInfo('Privacy Policy · Demo Mode','แสดงเฉพาะข้อมูลการจองของบัญชีที่เข้าสู่ระบบในต้นแบบ QR Code กับ Booking ID เป็นข้อมูลส่วนตัวของผู้ใช้ ไม่มีการรับข้อมูลเข้าสู่ระบบหรือข้อมูลการชำระเงินจริง'));
+  });
+</script>
+ 
+</body></html>
